@@ -169,8 +169,22 @@ const gameOver = () => {
     canvas.style.filter = "blur(8px)"
 }
 
+let baseSpeed = 300
+let minSpeed = 100
+let maxPoints = 300
+let levels = 10
+let pointsPerLevel = maxPoints / levels
+
+const calculateSpeed = () => {
+    let currentScore = parseInt(score.innerText)
+    let currentLevel = Math.floor(currentScore / pointsPerLevel)
+    let newSpeed = baseSpeed - ((baseSpeed - minSpeed) / levels) * currentLevel
+
+    return Math.max(newSpeed, minSpeed)
+}
+
 const gameLoop = () => {
-    clearInterval(loopId)
+    clearTimeout(loopId)
 
     ctx.clearRect(0, 0, 600, 600)
     drawGrid()
@@ -182,7 +196,7 @@ const gameLoop = () => {
 
     loopId = setTimeout(() => {
         gameLoop()
-    }, 300)
+    }, calculateSpeed())
 }
 
 gameLoop()
