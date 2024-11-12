@@ -183,7 +183,28 @@ const calculateSpeed = () => {
     return Math.max(newSpeed, minSpeed)
 }
 
+let isPaused = false
+
+const togglePause = () => {
+    isPaused = !isPaused
+
+    if (isPaused) {
+        clearTimeout(loopId)
+        menu.style.display = "flex"
+        menu.querySelector('.game-over').innerText = "Jogo Pausado"
+        canvas.style.filter = "blur(8px)"
+    }   
+    
+    else {
+        menu.style.display = "none"
+        canvas.style.filter = "none"
+        gameLoop()
+    }
+}
+
 const gameLoop = () => {
+    if (isPaused) return
+
     clearTimeout(loopId)
 
     ctx.clearRect(0, 0, 600, 600)
@@ -202,20 +223,26 @@ const gameLoop = () => {
 gameLoop()
 
 document.addEventListener("keydown", ({ key }) => {
-    if (key == "ArrowRight" && direction != "left") {
+    if (key == " ") {
+        togglePause()
+    }
+
+    if (!isPaused) {
+        if (key == "ArrowRight" && direction != "left") {
         direction = "right"
-    }
+        }
 
-    if (key == "ArrowLeft" && direction != "right") {
+        if (key == "ArrowLeft" && direction != "right") {
         direction = "left"
-    }
+        }
 
-    if (key == "ArrowDown" && direction != "up") {
+        if (key == "ArrowDown" && direction != "up") {
         direction = "down"
-    }
+        }
 
-    if (key == "ArrowUp" && direction != "down") {
+        if (key == "ArrowUp" && direction != "down") {
         direction = "up"
+        }
     }
 })
 
@@ -225,4 +252,9 @@ buttonPlay.addEventListener("click", () => {
     canvas.style.filter = "none"
 
     snake = [initialPosition]
+
+    isPaused = false
+    direction = undefined
+
+    gameLoop()
 })
