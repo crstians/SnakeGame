@@ -5,6 +5,7 @@ const score = document.querySelector(".score--value")
 const finalScore = document.querySelector(".final-score > span")
 const menu = document.querySelector(".menu-screen")
 const buttonPlay = document.querySelector(".btn-play")
+const toggleBorderMode = document.querySelector("#toggleBorderMode")
 
 const audio = new Audio("../assets/eatsong.mp3")
 
@@ -132,15 +133,30 @@ const checkCollision = () => {
     const head = snake[snake.length - 1]
     const canvasLimit = canvas.width - size
     const neckIndex = snake.length - 2
-
-    const wallCollision =
-        head.x < 0 || head.x > canvasLimit || head.y < 0 || head.y > canvasLimit
-
     const selfCollision = snake.find((position, index) => {
-        return index < neckIndex && position.x == head.x && position.y == head.y
+        return index < neckIndex && position.x == head.x && position.y == head.y;
     })
 
-    if (wallCollision || selfCollision) {
+    if (toggleBorderMode.checked) {
+        if (head.x < 0) head.x = canvasLimit
+        else if (head.x > canvasLimit) head.x = 0
+
+        if (head.y < 0) head.y = canvasLimit
+        else if (head.y > canvasLimit) head.y = 0
+    } else {
+        const wallCollision =
+            head.x < 0 || head.x > canvasLimit || head.y < 0 || head.y > canvasLimit
+
+        const selfCollision = snake.find((position, index) => {
+            return index < neckIndex && position.x == head.x && position.y == head.y
+        });
+
+        if (wallCollision || selfCollision) {
+            gameOver()
+            return
+        }
+    }
+    if (selfCollision) {
         gameOver()
     }
 }
