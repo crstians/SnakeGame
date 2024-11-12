@@ -10,6 +10,8 @@ const gameOverMenu = document.querySelector(".game-over-menu")
 const pauseScreen = document.querySelector(".pause-screen")
 const buttonResume = document.querySelector(".btn-resume")
 const buttonRestart = document.querySelector(".btn-restart")
+const welcomeScreen = document.querySelector(".welcome-screen")
+const buttonStart = document.querySelector(".btn-start")
 
 const audio = new Audio("../assets/eatsong.mp3")
 
@@ -225,6 +227,9 @@ const gameLoop = () => {
     }, calculateSpeed())
 }
 
+welcomeScreen.style.display = "flex";
+canvas.style.filter = "blur(8px)"
+
 gameLoop()
 
 document.addEventListener("keydown", ({ key }) => {
@@ -250,6 +255,14 @@ document.addEventListener("keydown", ({ key }) => {
         }
     }
 })
+
+buttonStart.addEventListener("click", () => {
+    welcomeScreen.style.display = "none"; // Esconde a tela inicial
+    canvas.style.filter = "none"; // Remove qualquer desfoque do canvas
+
+    // Inicializa o loop principal apenas ao começar o jogo
+    gameLoop();
+});
 
 buttonPlay.addEventListener("click", () => {
     score.innerText = "00";
