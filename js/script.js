@@ -21,11 +21,27 @@ const gameOverSounds = [
     new Audio("../assets/morte4.mp3"),
     new Audio("../assets/morte5.mp3")
 ]
+const gameStartSounds = [
+    new Audio("../assets/inicio1.mp3"),
+    new Audio("../assets/inicio2.mp3"),
+    new Audio("../assets/inicio3.mp3")
+]
+
+const welcomeAudio = new Audio("../assets/telainicio2.mp3"); // Corrigido nome para welcomeAudio
+
+const score400Audio = new Audio("../assets/pontuacao400.mp3"); // Áudio para pontuação 400
+const score910Audio = new Audio("../assets/pontuacao910.mp3"); // Áudio para pontuação 910
+
+let score400Played = false; // Garantir que o áudio de 400 toque apenas uma vez
+let score910Played = false;
+
 const size = 30
 
 const initialPosition = { x: 270, y: 240 }
 
 let snake = [initialPosition]
+
+let firstMove = true
 
 const incrementScore = () => {
     score.innerText = +score.innerText + 10
@@ -181,6 +197,16 @@ let pointsPerLevel = maxPoints / levels
 
 const calculateSpeed = () => {
     let currentScore = parseInt(score.innerText)
+
+    if (currentScore >= 400 && !score400Played) {
+        score400Audio.play();
+        score400Played = true;
+    }
+    if (currentScore >= 910 && !score910Played) {
+        score910Audio.play();
+        score910Played = true;
+    }
+
     let currentLevel = Math.floor(currentScore / pointsPerLevel)
     let newSpeed = baseSpeed - ((baseSpeed - minSpeed) / levels) * currentLevel
 
@@ -239,10 +265,20 @@ const gameLoop = () => {
 
 welcomeScreen.style.display = "flex";
 canvas.style.filter = "blur(8px)"
+welcomeAudio.loop = true
+welcomeAudio.play()
 
 gameLoop()
 
 document.addEventListener("keydown", ({ key }) => {
+    if (!direction) { // Toca o som de início apenas na primeira movimentação
+        if (firstMove) {
+            firstMove = false;
+            const randomStartSound = gameStartSounds[Math.floor(Math.random() * gameStartSounds.length)];
+            randomStartSound.play();
+        }
+    }
+
     if (key == " ") {
         togglePause()
     }
@@ -269,8 +305,12 @@ document.addEventListener("keydown", ({ key }) => {
 buttonStart.addEventListener("click", () => {
     welcomeScreen.style.display = "none"; // Esconde a tela inicial
     canvas.style.filter = "none"; // Remove qualquer desfoque do canvas
-
+    firstMove = true
     // Inicializa o loop principal apenas ao começar o jogo
+    welcomeAudio.pause();
+    welcomeAudio.currentTime = 0;
+    score400Played = false;
+    score910Played = false;
     gameLoop();
 });
 
@@ -284,6 +324,9 @@ buttonPlay.addEventListener("click", () => {
     isPaused = false;
     isGameOver = false;
     direction = undefined;
+    firstMove = true
+    score400Played = false;
+    score910Played = false;
 
     gameLoop();
 });
@@ -301,6 +344,7 @@ buttonRestart.addEventListener('click', () => {
     isPaused = false;
     isGameOver = false;
     direction = undefined;
+    firstMove = true
 
     gameLoop(); // Reinicia o jogo
 });
