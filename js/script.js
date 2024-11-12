@@ -6,6 +6,10 @@ const finalScore = document.querySelector(".final-score > span")
 const menu = document.querySelector(".menu-screen")
 const buttonPlay = document.querySelector(".btn-play")
 const toggleBorderMode = document.querySelector("#toggleBorderMode")
+const gameOverMenu = document.querySelector(".game-over-menu")
+const pauseScreen = document.querySelector(".pause-screen")
+const buttonResume = document.querySelector(".btn-resume")
+const buttonRestart = document.querySelector(".btn-restart")
 
 const audio = new Audio("../assets/eatsong.mp3")
 
@@ -161,14 +165,6 @@ const checkCollision = () => {
     }
 }
 
-const gameOver = () => {
-    direction = undefined
-
-    menu.style.display = "flex"
-    finalScore.innerText = score.innerText
-    canvas.style.filter = "blur(8px)"
-}
-
 let baseSpeed = 300
 let minSpeed = 100
 let maxPoints = 300
@@ -184,26 +180,35 @@ const calculateSpeed = () => {
 }
 
 let isPaused = false
+let isGameOver = false
 
 const togglePause = () => {
-    isPaused = !isPaused
+    if (isGameOver) return; // Evita pausa se o jogo estiver em Game Over
+
+    isPaused = !isPaused;
 
     if (isPaused) {
-        clearTimeout(loopId)
-        menu.style.display = "flex"
-        menu.querySelector('.game-over').innerText = "Jogo Pausado"
-        canvas.style.filter = "blur(8px)"
-    }   
-    
-    else {
-        menu.style.display = "none"
-        canvas.style.filter = "none"
-        gameLoop()
+        clearTimeout(loopId);
+        pauseScreen.style.display = "flex"; // Mostra a tela de pausa
+        canvas.style.filter = "blur(8px)";
+        pauseScreen.querySelector('.current-score span').innerText = score.innerText;
+    } else {
+        pauseScreen.style.display = "none"; // Esconde a tela de pausa
+        canvas.style.filter = "none";
+        gameLoop(); // Retoma o jogo
     }
-}
+};
+
+const gameOver = () => {
+    isGameOver = true;
+    clearTimeout(loopId);
+    gameOverMenu.style.display = "flex"; // Mostra a tela de Game Over
+    finalScore.innerText = score.innerText;
+    canvas.style.filter = "blur(8px)";
+};
 
 const gameLoop = () => {
-    if (isPaused) return
+    if (isPaused || isGameOver) return
 
     clearTimeout(loopId)
 
@@ -227,7 +232,7 @@ document.addEventListener("keydown", ({ key }) => {
         togglePause()
     }
 
-    if (!isPaused) {
+    if (!isPaused && !isGameOver) {
         if (key == "ArrowRight" && direction != "left") {
         direction = "right"
         }
@@ -247,14 +252,32 @@ document.addEventListener("keydown", ({ key }) => {
 })
 
 buttonPlay.addEventListener("click", () => {
-    score.innerText = "00"
-    menu.style.display = "none"
-    canvas.style.filter = "none"
+    score.innerText = "00";
+    gameOverMenu.style.display = "none";
+    pauseScreen.style.display = "none";
+    canvas.style.filter = "none";
 
-    snake = [initialPosition]
+    snake = [initialPosition];
+    isPaused = false;
+    isGameOver = false;
+    direction = undefined;
 
-    isPaused = false
-    direction = undefined
+    gameLoop();
+});
 
-    gameLoop()
-})
+buttonResume.addEventListener('click', () => {
+    togglePause(); // Retoma o jogo
+});
+
+buttonRestart.addEventListener('click', () => {
+    score.innerText = "00";
+    pauseScreen.style.display = "none"; // Fecha a tela de pausa
+    canvas.style.filter = "none";
+
+    snake = [initialPosition];
+    isPaused = false;
+    isGameOver = false;
+    direction = undefined;
+
+    gameLoop(); // Reinicia o jogo
+});
