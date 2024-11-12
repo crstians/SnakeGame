@@ -14,7 +14,13 @@ const welcomeScreen = document.querySelector(".welcome-screen")
 const buttonStart = document.querySelector(".btn-start")
 
 const audio = new Audio("../assets/eatsong.mp3")
-
+const gameOverSounds = [
+    new Audio("../assets/morte1.mp3"),
+    new Audio("../assets/morte2.mp3"),
+    new Audio("../assets/morte3.mp3"),
+    new Audio("../assets/morte4.mp3"),
+    new Audio("../assets/morte5.mp3")
+]
 const size = 30
 
 const initialPosition = { x: 270, y: 240 }
@@ -204,6 +210,10 @@ const togglePause = () => {
 const gameOver = () => {
     isGameOver = true;
     clearTimeout(loopId);
+    
+    const randomSound = gameOverSounds[Math.floor(Math.random() * gameOverSounds.length)];
+    randomSound.play()
+
     gameOverMenu.style.display = "flex"; // Mostra a tela de Game Over
     finalScore.innerText = score.innerText;
     canvas.style.filter = "blur(8px)";
